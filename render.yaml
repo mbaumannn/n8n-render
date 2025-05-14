@@ -10,13 +10,11 @@
 services:
   - type: web
     plan: free
-    # This is the runtime for services that pull a prebuilt Docker image
-    runtime: image
-    # You can give the service any name
     name: n8n-service
-    image:
-      # Pulls the n8n image tagged as latest from Docker Hub
-      url: docker.io/n8nio/n8n:latest
+    runtime: docker # Changed from 'image' to build from Dockerfile
+    dockerfilePath: ./Dockerfile # Path to your Dockerfile
+    dockerContext: . # Build context (root of your repo)
+    # The 'image:' block with 'url:' has been removed as we're building locally.
 
     # All environment variables defined below are required!
     #
@@ -31,7 +29,7 @@ services:
       - key: N8N_ENCRYPTION_KEY
         generateValue: true
 
-      # These automatically populate connection details 
+      # These automatically populate connection details
       # for the Render Postgres database defined below
       - key: DB_TYPE
         value: postgresdb
@@ -51,6 +49,7 @@ services:
         fromDatabase:
           name: n8n-db
           property: user
+    healthCheckPath: /healthz # Added for n8n health check
 
 databases:
   - name: n8n-db
@@ -62,4 +61,4 @@ databases:
     # increase the disk size to any multiple of 5 GB by
     # setting the `diskSizeGB` property.
     #
-    # diskSizeGB: 5
+    # diskSizeGB: 5 
