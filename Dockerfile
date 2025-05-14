@@ -4,15 +4,16 @@ FROM n8nio/n8n:latest
 # Switch to root user to install system dependencies and Python packages
 USER root
 
-# Install wkhtmltoimage (via wkhtmltopdf), pip, and necessary build tools
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+# Install wkhtmltoimage (via wkhtmltopdf), pip, and necessary build tools for Alpine
+RUN apk update && \
+    apk add --no-cache \
     wkhtmltopdf \
-    python3-pip \
-    python3-dev \
-    build-essential && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    python3 \
+    py3-pip \
+    build-base && \
+    # Note: Alpine's python3 package often includes pip. py3-pip is an explicit add just in case.
+    # build-base is similar to build-essential in Debian.
+    rm -rf /var/cache/apk/*
 
 # Copy the requirements file into a temporary location in the image
 COPY requirements.txt /tmp/requirements.txt
